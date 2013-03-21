@@ -1,0 +1,19 @@
+identity = {
+    'barrybot': {
+        'nickname': 'SampleNickname',       #Fill this out with the nickname you wish your bot to use
+        'realname': 'BarryBot-0.01',
+        'username': 'SampleUsername',       #Fill this out with the ident you wish your bot to use
+        'nickserv_pw': None                 #If your bot's nick is registered with NickServ on your network, input its password here
+    },
+}
+networks = {
+    'Freenode': {
+        'host': 'chat.eu.freenode.net',     #Set your Chat Network address here
+        'port': 8000,                       #Port Number
+        'ssl': True,                        #True / False for SSL connectivity
+        'identity': identity['barrybot'],   #If you want to have multiple networks then input which identity should be used for this network
+        'autojoin': (                       #Here put your comma-separated channels for joining.
+            '#channel',
+        )
+    }
+}
