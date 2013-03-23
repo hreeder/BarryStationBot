@@ -39,9 +39,8 @@ class BarryBot(irc.IRCClient):
             return
         if self.nickname in msg:
             prefix = "%s: " % (user.split('!', 1)[0], )
-            msg.substr
         if config.trigger in msg[:1]:
-            
+            print "Command: %s" % msg.split()[0][1:]
             prefix = "%s: " % (user.split('!', 1)[0], )
         else:
             prefix = ''
