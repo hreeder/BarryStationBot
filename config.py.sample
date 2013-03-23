@@ -17,3 +17,4 @@ networks = {
         )
     }
 }
+trigger = '!'                               #What do you want your bot to be triggered by

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
-import config
-import plugins
+import config, plugins
 from twisted.words.protocols import irc
 from twisted.internet import protocol, reactor, ssl
 
@@ -22,6 +21,12 @@ class BarryBot(irc.IRCClient):
             self.msg('NickServ', 'IDENTIFY %s' % (network[
                      'identity']['nickserv_pw'],))
 
+            reactor.callLater(10, reactor.callInThread, self.joinChannels)
+        else:
+            joinChannels(self)
+
+    def joinChannels(self):
+        network = self.factory.network
         for channel in network['autojoin']:
             self.join(channel)
 
@@ -33,6 +38,10 @@ class BarryBot(irc.IRCClient):
         if not user:
             return
         if self.nickname in msg:
+            prefix = "%s: " % (user.split('!', 1)[0], )
+            msg.substr
+        if config.trigger in msg[:1]:
+            
             prefix = "%s: " % (user.split('!', 1)[0], )
         else:
             prefix = ''
