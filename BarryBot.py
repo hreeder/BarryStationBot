@@ -1,8 +1,44 @@
 #!/usr/bin/env python
 import sys
-import config, plugins
+import config
+import plugins
 from twisted.words.protocols import irc
-from twisted.internet import protocol, reactor, ssl
+from twisted.internet import protocol, reactor
+try:
+    from twisted.internet import ssl
+except Exception, e:
+    print "SSL Not Installed"
+
+
+def notAdd(self, channel, user, arguments):
+    return int(arguments[1]) + int(arguments[2])
+
+
+def tellOffKaffo(self, channel, user, arguments):
+    return arguments[1] + " is a bad person!"
+
+def tellMeChannelName(self, channel, user, arguments):
+    if channel == '#barrystation12-ops':
+        return "DICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKS"
+    else:
+        return channel
+
+def whoAmI(self, channel, user, arguments):
+    self.sendLine("WHO %s \%na" % user)
+    print result
+    return result
+
+def stopRunning(self, channel, user, arguments):
+    self.quit()
+    reactor.stop()
+
+commands = {
+    "add": notAdd,
+    "badperson": tellOffKaffo,
+    "chan": tellMeChannelName,
+    "whoami": whoAmI,
+    "die": stopRunning
+}
 
 
 class BarryBot(irc.IRCClient):
@@ -38,16 +74,25 @@ class BarryBot(irc.IRCClient):
         if not user:
             return
         if self.nickname in msg:
+            # command = msg.split()[0][1:]
+            command = ''
             prefix = "%s: " % (user.split('!', 1)[0], )
         if config.trigger in msg[:1]:
-            print "Command: %s" % msg.split()[0][1:]
+            command = msg.split()[0][1:]
             prefix = "%s: " % (user.split('!', 1)[0], )
         else:
             prefix = ''
 
         if prefix:
-            self.msg(channel, prefix + "hello")
-            print "[%s] %s: %s" % (channel, self.factory.network['identity']['nickname'], prefix + "hello",)
+            if command:
+                args = msg.split()
+                result = commands[command](self, channel, user, args)
+                output = prefix + str(result)
+                self.msg(channel, output)
+            print "[%s] %s: %s" % (channel, self.factory.network['identity']['nickname'], output,)
+
+    def irc_RPL_WHOREPLY(self, msg):
+        print msg
 
     def _get_nickname(self):
         return self.factory.network['identity']['nickname']
@@ -60,6 +105,7 @@ class BarryBot(irc.IRCClient):
     nickname = property(_get_nickname)
     realname = property(_get_realname)
     username = property(_get_username)
+
 
 
 class BarryBotFactory(protocol.ClientFactory):
