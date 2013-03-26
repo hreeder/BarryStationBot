@@ -6,7 +6,7 @@ from twisted.words.protocols import irc
 from twisted.internet import protocol, reactor
 try:
     from twisted.internet import ssl
-except Exception, e:
+except ImportError:
     print "SSL Not Installed"
 
 
@@ -26,8 +26,8 @@ def tellMeChannelName(self, channel, user, arguments):
 
 
 def whoAmI(self, channel, user, arguments):
-    self.sendLine("WHO %s \%na" % user)
-    print result
+    self.sendLine("WHO %s %%na" % user)
+    result = "NotImplemented"
     return result
 
 
@@ -58,8 +58,8 @@ class BarryBot(irc.IRCClient):
         network = self.factory.network
 
         if network['identity']['nickserv_pw']:
-            self.msg('NickServ', 'IDENTIFY %s' % (network[
-                     'identity']['nickserv_pw'],))
+            self.msg('NickServ', 'IDENTIFY %s' \
+                     % (network['identity']['nickserv_pw'],))
 
             reactor.callLater(10, reactor.callInThread, self.joinChannels)
         else:
@@ -88,10 +88,14 @@ class BarryBot(irc.IRCClient):
 
         if prefix:
             if command:
-                args = msg.split()
-                result = commands[command](self, channel, user, args)
-                output = prefix + str(result)
-                self.msg(channel, output)
+                try:
+                    args = msg.split()
+                    result = commands[command](self, channel, user, args)
+                    output = prefix + str(result)
+                    self.msg(channel, output)
+                except KeyError:
+                    output = "Couldn't find " + command + "."
+                    self.msg(channel, output) # Could probably clean up the double self.msg
             print "[%s] %s: %s" % (channel, self.factory.network['identity']['nickname'], output,)
 
     def irc_RPL_WHOREPLY(self, *msg):
