@@ -17,16 +17,19 @@ def notAdd(self, channel, user, arguments):
 def tellOffKaffo(self, channel, user, arguments):
     return arguments[1] + " is a bad person!"
 
+
 def tellMeChannelName(self, channel, user, arguments):
     if channel == '#barrystation12-ops':
         return "DICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKSDICKS"
     else:
         return channel
 
+
 def whoAmI(self, channel, user, arguments):
     self.sendLine("WHO %s \%na" % user)
     print result
     return result
+
 
 def stopRunning(self, channel, user, arguments):
     self.quit()
@@ -42,6 +45,7 @@ commands = {
 
 
 class BarryBot(irc.IRCClient):
+
     def connectionMade(self):
         irc.IRCClient.connectionMade(self)
 
@@ -74,8 +78,7 @@ class BarryBot(irc.IRCClient):
         if not user:
             return
         if self.nickname in msg:
-            # command = msg.split()[0][1:]
-            command = ''
+            command = msg.split()[0][1:]
             prefix = "%s: " % (user.split('!', 1)[0], )
         if config.trigger in msg[:1]:
             command = msg.split()[0][1:]
@@ -91,7 +94,7 @@ class BarryBot(irc.IRCClient):
                 self.msg(channel, output)
             print "[%s] %s: %s" % (channel, self.factory.network['identity']['nickname'], output,)
 
-    def irc_RPL_WHOREPLY(self, msg):
+    def irc_RPL_WHOREPLY(self, *msg):
         print msg
 
     def _get_nickname(self):
@@ -105,7 +108,6 @@ class BarryBot(irc.IRCClient):
     nickname = property(_get_nickname)
     realname = property(_get_realname)
     username = property(_get_username)
-
 
 
 class BarryBotFactory(protocol.ClientFactory):
